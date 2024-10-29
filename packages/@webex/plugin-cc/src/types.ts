@@ -149,24 +149,23 @@ export interface SubscribeRequest {
 
 export type EventResult = IAgentProfile;
 
-export const BUDDY_AGENT_MEDIA_TYPE = {
+export const CHANNEL_NAME = {
   TELEPHONY: 'telephony',
   CHAT: 'chat',
   SOCIAL: 'social',
   EMAIL: 'email',
 } as const;
 
-export type BuddyAgentMediaType = Enum<typeof BUDDY_AGENT_MEDIA_TYPE>;
+export type CHANNEL_NAME = Enum<typeof CHANNEL_NAME>;
 
 export const BUDDY_AGENT_STATE = {
   AVAILABLE: 'Available',
   IDLE: 'Idle',
 } as const;
 
-export type BuddyAgentState = Enum<typeof BUDDY_AGENT_STATE>;
+export type BUDDY_AGENT_STATE = Enum<typeof BUDDY_AGENT_STATE>;
 
-export type GetBuddyAgentsOptions = {
-  agentProfileId?: string;
-  mediaType: BuddyAgentMediaType;
-  state?: BuddyAgentState;
+export type GetBuddyAgentsRequest = {
+  channelName: CHANNEL_NAME;
+  state?: BUDDY_AGENT_STATE;
 };

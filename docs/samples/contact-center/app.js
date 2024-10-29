@@ -150,23 +150,31 @@ async function handleAgentLogin(e) {
 
 async function fetchBuddyAgents() {
   try {
-    const buddyAgents = await webex.cc.getBuddyAgents({mediaType:'telephony', state: 'Available'});
-    const buddyAgentsList = document.getElementById('buddyAgentsList');
-    buddyAgentsList.innerHTML = ''; // Clear previous list
+    const buddyAgentsResponse = await webex.cc.getBuddyAgents({channelName: 'telephony', state: 'Available'});
+    const buddyAgentsDropdown = document.getElementById('buddyAgentsDropdown');
+    buddyAgentsDropdown.innerHTML = ''; // Clear previous options
 
-    if( buddyAgents.length === 0 ){
-      buddyAgentsList.innerHTML = 'No buddy agents available';
+    if (buddyAgentsResponse.agentList.length === 0) {
+      const option = document.createElement('option');
+      option.text = 'No buddy agents available';
+      option.disabled = true;
+      buddyAgentsDropdown.add(option);
       return;
     }
 
-    buddyAgents.forEach((agent) => {
-      const listItem = document.createElement('li');
-      listItem.textContent = `${agent.agentName} - ${agent.state}`;
-      listItem.setAttribute('data-agent-id', agent.agentId);
-      buddyAgentsList.appendChild(listItem);
+    buddyAgentsResponse.agentList.forEach((agent) => {
+      const option = document.createElement('option');
+      option.text = `${agent.agentName} - ${agent.state}`;
+      option.value = agent.agentId;
+      buddyAgentsDropdown.add(option);
     });
   } catch (error) {
-    buddyAgentsList.innerHTML = `Failed to fetch buddy agents, ${error}`; // Clear previous list
+    const buddyAgentsDropdown = document.getElementById('buddyAgentsDropdown');
+    buddyAgentsDropdown.innerHTML = ''; // Clear previous options
+    const option = document.createElement('option');
+    option.text = `Failed to fetch buddy agents, ${error}`;
+    option.disabled = true;
+    buddyAgentsDropdown.add(option);
     console.log('Failed to fetch buddy agents', error);
   }
 }

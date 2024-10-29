@@ -91,7 +91,7 @@ class HttpRequest {
       Object.keys(payload).forEach((key) => payload[key] === undefined && delete payload[key]);
 
       // Send the service request
-      const response: IHttpResponse = await this.webex.request({
+      const response = await this.webex.request({
         service,
         resource,
         method,

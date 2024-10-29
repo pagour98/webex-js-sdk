@@ -2,20 +2,14 @@ import {STATION_LOGIN_TYPE, WebexSDK, HTTP_METHODS} from '../types';
 import {
   AGENT,
   GET_BUDDY_AGENTS_API,
-  GET_BUDDY_AGENTS_EVENT,
-  GET_BUDDY_AGENTS_FAILED_EVENT,
-  GET_BUDDY_AGENTS_SUCCESS_EVENT,
+  BuddyAgentsEvent,
+  BuddyAgentsRetrieveFailedEvent,
   LOGIN_API,
   WCC_API_GATEWAY,
   WEB_RTC_PREFIX,
 } from './constants';
 import HttpRequest from './HttpRequest';
-import {
-  BuddyAgentsEvent,
-  BuddyAgentsResponse,
-  GetBuddyAgentsOptions,
-  StationLoginSuccess,
-} from './types';
+import {BuddyAgentsSuccess, BuddyAgents, StationLoginSuccess} from './types';
 
 export default class AgentService {
   private webex: WebexSDK;
@@ -71,26 +65,23 @@ export default class AgentService {
     }
   }
 
-  public async getBuddyAgents(options: GetBuddyAgentsOptions): Promise<BuddyAgentsResponse> {
+  public async getBuddyAgents(options: BuddyAgents): Promise<BuddyAgentsSuccess> {
     try {
-      const {agentProfileId, mediaType, state} = options;
-      const payload = {
-        agentProfileId,
-        mediaType,
-        state,
-      };
-
       const data = await this.httpRequest.sendRequestWithEvent({
         service: WCC_API_GATEWAY,
         resource: GET_BUDDY_AGENTS_API,
         method: HTTP_METHODS.POST,
-        payload,
-        eventType: GET_BUDDY_AGENTS_EVENT,
-        success: [GET_BUDDY_AGENTS_SUCCESS_EVENT],
-        failure: [GET_BUDDY_AGENTS_FAILED_EVENT],
+        payload: {
+          agentProfileId: options.agentProfileId,
+          mediaType: options.channelName,
+          state: options.state || undefined,
+        },
+        eventType: BuddyAgentsEvent,
+        success: [BuddyAgentsEvent],
+        failure: [BuddyAgentsRetrieveFailedEvent],
       });
 
-      return (data as BuddyAgentsEvent).agentList;
+      return data as BuddyAgentsSuccess;
     } catch (error) {
       this.webex.logger.error(`Error during get buddy agents: ${error}`);
 

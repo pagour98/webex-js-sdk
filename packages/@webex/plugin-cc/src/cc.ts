@@ -9,14 +9,14 @@ import {
   SubscribeRequest,
   WelcomeEvent,
   STATION_LOGIN_TYPE,
-  GetBuddyAgentsOptions,
-  BUDDY_AGENT_MEDIA_TYPE,
+  GetBuddyAgentsRequest,
+  CHANNEL_NAME,
 } from './types';
+import {BuddyAgentsSuccess, StationLoginSuccess} from './services/types';
 import {READY, CC_FILE} from './constants';
 import Agent from './features/Agent';
 import HttpRequest from './services/HttpRequest';
 import WebRTCCalling from './WebRTCCalling';
-import {BuddyAgentsResponse, StationLoginSuccess} from './services/types';
 
 export default class ContactCenter extends WebexPlugin implements IContactCenter {
   namespace = 'cc';
@@ -140,26 +140,27 @@ export default class ContactCenter extends WebexPlugin implements IContactCenter
   }
 
   /**
-   * @param options - GetBuddyAgentsOptions
-   * @returns Promise<BuddyAgentsResponse>
+   * @param options - GetBuddyAgentsRequest
+   * @returns Promise<BuddyAgentsSuccess>
    * @throws Error
    * @example
    * const buddyAgents = await webex.cc.getBuddyAgents({
-   *  agentProfileId: 'selfAgentProfileId',
-   *  mediaType: BUDDY_AGENT_MEDIA_TYPE.TELEPHONY,
+   *  channelType: CHANNEL_TYPE.TELEPHONY,
    *  state: BuddyAgentState.AVAILABLE,
    *  });
    */
-  public async getBuddyAgents({
-    options = {
-      agentProfileId: this.agentConfig.agentProfileId,
-      mediaType: BUDDY_AGENT_MEDIA_TYPE.TELEPHONY,
-    },
-  }: {
-    options: GetBuddyAgentsOptions;
-  }): Promise<BuddyAgentsResponse> {
+  public async getBuddyAgents(
+    options: GetBuddyAgentsRequest = {
+      channelName: CHANNEL_NAME.TELEPHONY,
+    }
+  ): Promise<BuddyAgentsSuccess> {
     try {
-      const buddyAgents = await this.agent.getBuddyAgents(options);
+      const {channelName, state} = options;
+      const buddyAgents = await this.agent.getBuddyAgents({
+        agentProfileId: this.agentConfig.agentProfileId,
+        channelName,
+        state,
+      });
       this.$webex.logger.log('Get Buddy Agents API SUCCESS');
 
       return buddyAgents;

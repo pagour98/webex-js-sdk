@@ -11,6 +11,5 @@ export const WEB_RTC_PREFIX = 'webrtc-';
 
 export const AgentDesktopMessage = 'AgentDesktopMessage';
 
-export const GET_BUDDY_AGENTS_EVENT = 'BuddyAgents';
-export const GET_BUDDY_AGENTS_SUCCESS_EVENT = 'BuddyAgents';
-export const GET_BUDDY_AGENTS_FAILED_EVENT = 'BuddyAgentsRetrieveFailed';
+export const BuddyAgentsEvent = 'BuddyAgents';
+export const BuddyAgentsRetrieveFailedEvent = 'BuddyAgentsRetrieveFailed';

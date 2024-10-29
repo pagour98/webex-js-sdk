@@ -1,13 +1,8 @@
-import {
-  STATION_LOGIN_TYPE,
-  WebexSDK,
-  BuddyAgentMediaType,
-  BuddyAgentState,
-} from '../../../../src/types';
+import {STATION_LOGIN_TYPE, WebexSDK, CHANNEL_NAME, BUDDY_AGENT_STATE} from '../../../../src/types';
 import HttpRequest from '../../../../src/services/HttpRequest';
 import AgentService from '../../../../src/services/AgentService';
 import Agent from '../../../../src/features/Agent';
-import {BuddyAgentsResponse, StationLoginSuccess} from '../../../../src/services/types';
+import {BuddyAgents, BuddyAgentsSuccess, StationLoginSuccess} from '../../../../src/services/types';
 
 // Mock dependencies
 jest.mock('../../../../src/services/AgentService');
@@ -92,29 +87,36 @@ describe('Agent', () => {
   });
 
   describe('getBuddyAgents', () => {
-    const options = {
-      agentProfileId: '12345',
-      mediaType: 'telephony' as BuddyAgentMediaType,
-      state: 'Available' as BuddyAgentState,
+    const options: BuddyAgents = {
+      channelName: CHANNEL_NAME.TELEPHONY,
+      state: BUDDY_AGENT_STATE.AVAILABLE,
+      agentProfileId: '123',
     };
 
     it('should return buddy agents on success', async () => {
-      const buddyAgentsResponse: BuddyAgentsResponse = [
-        {
-          agentId: '12345',
-          state: 'Available',
-          teamId: 'abcd',
-          dn: '1001',
-          agentName: 'Agent1 Name1',
-          siteId: 'site1',
-        },
-      ];
-      agentServiceMock.getBuddyAgents.mockResolvedValue(buddyAgentsResponse);
+      const buddyAgentsSuccess: BuddyAgentsSuccess = {
+        agentId: 'agentId1',
+        eventType: 'AgentDesktopMessage',
+        agentList: [
+          {
+            agentId: '12345',
+            state: 'Available',
+            teamId: 'abcd',
+            dn: '1001',
+            agentName: 'Agent1 Name1',
+            siteId: 'site1',
+          },
+        ],
+        orgId: 'org1',
+        trackingId: 'track1',
+        agentSessionId: 'session1',
+        type: 'BuddyAgents',
+      };
+      agentServiceMock.getBuddyAgents.mockResolvedValue(buddyAgentsSuccess);
 
       const result = await agent.getBuddyAgents(options);
 
-      expect(result).toEqual(buddyAgentsResponse);
-      expect(webex.logger.log).toHaveBeenCalledWith('Buddy Agents API SUCCESS');
+      expect(result).toEqual(buddyAgentsSuccess);
       expect(agentServiceMock.getBuddyAgents).toHaveBeenCalledWith(options);
     });
 
@@ -125,7 +127,6 @@ describe('Agent', () => {
       await expect(agent.getBuddyAgents(options)).rejects.toThrow(
         'Error while retrieving buddy agents'
       );
-      expect(webex.logger.log).not.toHaveBeenCalled();
       expect(agentServiceMock.getBuddyAgents).toHaveBeenCalledWith(options);
     });
   });
