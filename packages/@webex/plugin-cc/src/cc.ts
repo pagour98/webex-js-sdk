@@ -9,12 +9,14 @@ import {
   SubscribeRequest,
   WelcomeEvent,
   STATION_LOGIN_TYPE,
+  GetBuddyAgentsOptions,
+  BUDDY_AGENT_MEDIA_TYPE,
 } from './types';
 import {READY, CC_FILE} from './constants';
 import Agent from './features/Agent';
 import HttpRequest from './services/HttpRequest';
 import WebRTCCalling from './WebRTCCalling';
-import {StationLoginSuccess} from './services/types';
+import {BuddyAgentsResponse, StationLoginSuccess} from './services/types';
 
 export default class ContactCenter extends WebexPlugin implements IContactCenter {
   namespace = 'cc';
@@ -134,6 +136,37 @@ export default class ContactCenter extends WebexPlugin implements IContactCenter
       return loginPromise;
     } catch (error) {
       return Promise.reject(error);
+    }
+  }
+
+  /**
+   * @param options - GetBuddyAgentsOptions
+   * @returns Promise<BuddyAgentsResponse>
+   * @throws Error
+   * @example
+   * const buddyAgents = await webex.cc.getBuddyAgents({
+   *  agentProfileId: 'selfAgentProfileId',
+   *  mediaType: BUDDY_AGENT_MEDIA_TYPE.TELEPHONY,
+   *  state: BuddyAgentState.AVAILABLE,
+   *  });
+   */
+  public async getBuddyAgents({
+    options = {
+      agentProfileId: this.agentConfig.agentProfileId,
+      mediaType: BUDDY_AGENT_MEDIA_TYPE.TELEPHONY,
+    },
+  }: {
+    options: GetBuddyAgentsOptions;
+  }): Promise<BuddyAgentsResponse> {
+    try {
+      const buddyAgents = await this.agent.getBuddyAgents(options);
+      this.$webex.logger.log('Get Buddy Agents API SUCCESS');
+
+      return buddyAgents;
+    } catch (error) {
+      this.$webex.logger.error('Get Buddy Agents API FAILED');
+
+      return Promise.reject(new Error('Error while retrieving buddy agents', error.message));
     }
   }
 }

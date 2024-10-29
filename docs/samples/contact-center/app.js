@@ -148,11 +148,33 @@ async function handleAgentLogin(e) {
   }
 }
 
+async function fetchBuddyAgents() {
+  try {
+    const buddyAgents = await webex.cc.getBuddyAgents({mediaType:'telephony', state: 'Available'});
+    const buddyAgentsList = document.getElementById('buddyAgentsList');
+    buddyAgentsList.innerHTML = ''; // Clear previous list
+
+    if( buddyAgents.length === 0 ){
+      buddyAgentsList.innerHTML = 'No buddy agents available';
+      return;
+    }
+
+    buddyAgents.forEach((agent) => {
+      const listItem = document.createElement('li');
+      listItem.textContent = `${agent.agentName} - ${agent.state}`;
+      listItem.setAttribute('data-agent-id', agent.agentId);
+      buddyAgentsList.appendChild(listItem);
+    });
+  } catch (error) {
+    buddyAgentsList.innerHTML = `Failed to fetch buddy agents, ${error}`; // Clear previous list
+    console.log('Failed to fetch buddy agents', error);
+  }
+}
+
 function doAgentLogin() {
   webex.cc.stationLogin({teamId: teamsDropdown.value, loginOption: agentDeviceType, dialNumber: dialNumber.value}).then((response) => {
     console.log('Agent Logged in successfully', response);
-  }
-  ).catch((error) => {
+  }).catch((error) => {
     console.log('Agent Login failed', error);
   });
 }

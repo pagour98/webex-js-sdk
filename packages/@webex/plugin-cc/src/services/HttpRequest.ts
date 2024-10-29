@@ -96,14 +96,24 @@ class HttpRequest {
     try {
       const {service, resource, method, payload, eventType, success, failure} = options;
 
+      // prune undefined values
+      Object.keys(payload).forEach((key) => payload[key] === undefined && delete payload[key]);
+
       // Send the service request
-      const response = await this.webex.request({
+      const response: IHttpResponse = await this.webex.request({
         service,
         resource,
         method,
         body: payload,
       });
-      this.webex.logger.log(`Service request sent successfully: ${response}`);
+      // @ts-ignore
+      const trackingid = response.headers.trackingid;
+
+      this.webex.logger.log(
+        `Service request sent successfully to ${service}/${resource} with payload: ${JSON.stringify(
+          payload
+        )}, Request TrackingID: ${trackingid}`
+      );
 
       // Listen for the event
       return new Promise((resolve, reject) => {

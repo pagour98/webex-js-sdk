@@ -1,7 +1,7 @@
-import {STATION_LOGIN_TYPE, WebexSDK} from '../types';
+import {BuddyAgentMediaType, BuddyAgentState, STATION_LOGIN_TYPE, WebexSDK} from '../types';
 import HttpRequest from '../services/HttpRequest';
 import AgentService from '../services/AgentService';
-import {StationLoginSuccess} from '../services/types';
+import {BuddyAgentsResponse, StationLoginSuccess} from '../services/types';
 
 export default class Agent {
   private webex: WebexSDK;
@@ -32,6 +32,27 @@ export default class Agent {
       return loginResponse;
     } catch (error) {
       return Promise.reject(new Error('Error while performing agent login', error));
+    }
+  }
+
+  public async getBuddyAgents(options: {
+    agentProfileId?: string;
+    mediaType: BuddyAgentMediaType;
+    state?: BuddyAgentState;
+  }): Promise<BuddyAgentsResponse> {
+    const {agentProfileId, mediaType, state} = options;
+
+    try {
+      const buddyAgents = await this.agentService.getBuddyAgents({
+        agentProfileId,
+        mediaType,
+        state,
+      });
+      this.webex.logger.log('Buddy Agents API SUCCESS');
+
+      return buddyAgents;
+    } catch (error) {
+      return Promise.reject(new Error('Error while retrieving buddy agents', error));
     }
   }
 }

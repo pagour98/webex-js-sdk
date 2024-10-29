@@ -1,3 +1,6 @@
+import {BuddyAgentMediaType, BuddyAgentState} from '../types';
+import {GET_BUDDY_AGENTS_SUCCESS_EVENT, AgentDesktopMessage} from './constants';
+
 type Enum<T extends Record<string, unknown>> = T[keyof T];
 
 export type Msg<T = any> = {
@@ -227,3 +230,30 @@ export interface StationLoginSuccess {
   supervisorSessionId?: string;
   type: 'AgentStationLoginSuccess';
 }
+
+export type GetBuddyAgentsOptions = {
+  agentProfileId: string;
+  mediaType: BuddyAgentMediaType;
+  state?: BuddyAgentState;
+};
+
+export interface BuddyAgent {
+  agentId: string;
+  state: string;
+  teamId: string;
+  dn: string;
+  agentName: string;
+  siteId: string;
+}
+
+export type BuddyAgentsResponse = BuddyAgent[];
+
+export type BuddyAgentsEvent = {
+  eventType: typeof AgentDesktopMessage;
+  agentId: string;
+  orgId: string;
+  trackingId: string;
+  agentList: BuddyAgent[];
+  agentSessionId: string;
+  type: typeof GET_BUDDY_AGENTS_SUCCESS_EVENT;
+};
