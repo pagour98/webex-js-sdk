@@ -257,3 +257,12 @@ export type BuddyAgentsEvent = {
   agentSessionId: string;
   type: typeof GET_BUDDY_AGENTS_SUCCESS_EVENT;
 };
+
+export type SubscribeResponse = {
+  statusCode: number;
+  body: {
+    webSocketUrl?: string;
+    subscriptionId?: string;
+  };
+  message: string | null;
+};
